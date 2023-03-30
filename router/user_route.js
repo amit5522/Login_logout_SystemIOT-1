@@ -4,7 +4,7 @@ const {register,verify_otp,
     loadUser, logOutUser, activate,
     sendResetOtp,
     verifyemail_otp,
-    resetPhone
+    resetPhone 
 }=require('../controller/userController');
 const authMiddleware = require('../middleware/auth-middleware');
 
