@@ -7,6 +7,10 @@ const crypto = require('crypto')
 const OTPLIMIT = require('../models/otp-time-limit_model')
 
 
+//configure dot env
+const dotenv = require("dotenv");
+dotenv.config({ path: "../.env" });
+
 
 const login = async (req, res) => {
     try {
@@ -167,7 +171,10 @@ const verify_otp = async (req, res) => {
 
                     res.cookie('accessToken', accessToken, {
                         expireIn: 1000 * 60 * 60 * 30 * 24,
-                        httpOnly: false
+                        httpOnly: true,
+                        sameSite: process.env.dev === "development" ? true : "none",
+                secure: process.env.dev === "development" ? false : true,
+                
                     })
 
                     res.status(201).json({
@@ -265,7 +272,9 @@ const logOutUser = async (req, res) => {
 
         res.cookie('accessToken', null, {
             expireIn: Date.now(),
-            httpOnly: true
+            httpOnly: true,
+            sameSite: process.env.dev === "development" ? true : "none",
+                secure: process.env.dev === "development" ? false : true,
         })
 
         res.status(201).json({
@@ -296,6 +305,7 @@ const sendResetOtp = async (req, res) => {
             const user = await User.findOne({ email: email });
             if (!user)
                 throw new Error("User Not Found!!");
+                
              //checking resend otp time
              const otplimit=await OTPLIMIT.findOne({otpDestination:email})   
              if(otplimit&& otplimit.timelimit>Date.now()){
@@ -304,7 +314,7 @@ const sendResetOtp = async (req, res) => {
             //generate otp
 
             const otp = await OtpServices.generateOtp();
-
+      
             //hash otp
             //expire in 2 minutes 
             const ttl = 1000 * 60 * 2;
@@ -318,7 +328,9 @@ const sendResetOtp = async (req, res) => {
                 subject: "Reset phone OTP",
                 message: `Your Reset Phone OTP is : ${otp},valid for 2 minutes.`
             }
+           
             await sendEmail(options);
+            
 
             //set new otplimit time
             if(otplimit){
@@ -437,7 +449,9 @@ const resetPhone = async (req, res) => {
 
         res.cookie('accessToken', accessToken, {
             expireIn: 1000 * 60 * 60 * 30 * 24,
-            httpOnly: false
+            httpOnly: true,
+            sameSite: process.env.dev === "development" ? true : "none",
+                secure: process.env.dev === "development" ? false : true,
         })
 
         res.status(201).json({

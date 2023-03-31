@@ -32,4 +32,5 @@ const addDevice=async(req,res)=>{
     }
 }
 
+
 module.exports={addDevice}
