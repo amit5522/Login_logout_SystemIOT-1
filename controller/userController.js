@@ -170,7 +170,7 @@ const verify_otp = async (req, res) => {
 
 
                     res.cookie('accessToken', accessToken, {
-                        expireIn: 1000 * 60 * 60 * 30 * 24,
+                        maxAge:1000*60*60*24*30,
                         httpOnly: true,
                         sameSite: process.env.dev === "development" ? true : "none",
                 secure: process.env.dev === "development" ? false : true,
@@ -448,7 +448,7 @@ const resetPhone = async (req, res) => {
 
 
         res.cookie('accessToken', accessToken, {
-            expireIn: 1000 * 60 * 60 * 30 * 24,
+            maxAge:1000*60*60*24*30,
             httpOnly: true,
             sameSite: process.env.dev === "development" ? true : "none",
                 secure: process.env.dev === "development" ? false : true,
