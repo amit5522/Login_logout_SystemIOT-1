@@ -23,15 +23,15 @@ const login = async (req, res) => {
             if (phone.length != 13)
                 throw new Error("Invalid phone number")
 
-             //checking user is register or not
-             let user = await User.findOne({ phone: phone });   
-             if(!user)
-               throw new Error("User Not Registered")
+            //checking user is register or not
+            let user = await User.findOne({ phone: phone });
+            if (!user)
+                throw new Error("User Not Registered")
             //checking resend otp time
-            const otplimit=await OTPLIMIT.findOne({otpDestination:phone})   
-            if(otplimit&& otplimit.timelimit>Date.now()){
-                  throw new Error("Resend OTP disable for 2 minutes.")
-            } 
+            const otplimit = await OTPLIMIT.findOne({ otpDestination: phone })
+            if (otplimit && otplimit.timelimit > Date.now()) {
+                throw new Error("Resend OTP disable for 2 minutes.")
+            }
             //generate otp 
             const otp = await OtpServices.generateOtp();
 
@@ -41,21 +41,25 @@ const login = async (req, res) => {
             const expire = Date.now() + ttl;
             const data = `${otp}`
             const hash = await HashService.hashOtp(data);
-
+            let phoneNo=phone.substring(3,14);
             //send otp by sms
-            await  OtpServices.sendBySms(phone, otp);
+          const smsResponse=  await OtpServices.sendBySms(phoneNo, otp);
+          if(!smsResponse.return)
+              throw new Error(smsResponse.message);
+       
+         //console.log(smsResponse.message[0]);
 
             //set new otplimit time
-            if(otplimit){
-                otplimit.timelimit=expire;
+            if (otplimit) {
+                otplimit.timelimit = expire;
                 await otplimit.save();
-            }else{
-                await OTPLIMIT.create({ 
-                    otpDestination:phone,
-                    timelimit:expire
-                 })
+            } else {
+                await OTPLIMIT.create({
+                    otpDestination: phone,
+                    timelimit: expire
+                })
             }
-           
+
             res.status(201).json({
                 "success": true,
                 "message": "OTP send successfully",
@@ -85,15 +89,15 @@ const register = async (req, res) => {
             if (phone.length != 13)
                 throw new Error("Invalid phone number")
 
-             //checking user is register or not
-             let user = await User.findOne({ phone: phone });   
-             if(user)
-               throw new Error("User already registered")
+            //checking user is register or not
+            let user = await User.findOne({ phone: phone });
+            if (user)
+                throw new Error("User already registered")
             //checking resend otp time
-            const otplimit=await OTPLIMIT.findOne({otpDestination:phone})   
-            if(otplimit&& otplimit.timelimit>Date.now()){
-                  throw new Error("Resend OTP disable for 2 minutes.")
-            } 
+            const otplimit = await OTPLIMIT.findOne({ otpDestination: phone })
+            if (otplimit && otplimit.timelimit > Date.now()) {
+                throw new Error("Resend OTP disable for 2 minutes.")
+            }
             //generate otp 
             const otp = await OtpServices.generateOtp();
 
@@ -105,19 +109,25 @@ const register = async (req, res) => {
             const hash = await HashService.hashOtp(data);
 
             //send otp by sms
-            await  OtpServices.sendBySms(phone, otp);
+            let phoneNo=phone.substring(3,14);
+            //send otp by sms
+          const smsResponse=  await OtpServices.sendBySms(phoneNo, otp);
+          if(!smsResponse.return)
+              throw new Error(smsResponse.message);
+       
+         //console.log(smsResponse.message[0]);
 
             //set new otplimit time
-            if(otplimit){
-                otplimit.timelimit=expire;
+            if (otplimit) {
+                otplimit.timelimit = expire;
                 await otplimit.save();
-            }else{
-                await OTPLIMIT.create({ 
-                    otpDestination:phone,
-                    timelimit:expire
-                 })
+            } else {
+                await OTPLIMIT.create({
+                    otpDestination: phone,
+                    timelimit: expire
+                })
             }
-           
+
             res.status(201).json({
                 "success": true,
                 "message": "OTP send successfully",
@@ -166,15 +176,15 @@ const verify_otp = async (req, res) => {
                     //console.log(user)
                     const { accessToken } = tokenService.generateToken({ _id: user._id });
 
-                   
+
 
 
                     res.cookie('accessToken', accessToken, {
-                        maxAge:1000*60*60*24*30,
+                        maxAge: 1000 * 60 * 60 * 24 * 30,
                         httpOnly: true,
                         sameSite: process.env.dev === "development" ? true : "none",
-                secure: process.env.dev === "development" ? false : true,
-                
+                        secure: process.env.dev === "development" ? false : true,
+
                     })
 
                     res.status(201).json({
@@ -248,7 +258,7 @@ const activate = async (req, res) => {
 const loadUser = async (req, res) => {
 
     try {
-        
+
         const { _id } = req.user;
         const user = await User.findById(_id);
         res.status(201).json({
@@ -274,7 +284,7 @@ const logOutUser = async (req, res) => {
             expireIn: Date.now(),
             httpOnly: true,
             sameSite: process.env.dev === "development" ? true : "none",
-                secure: process.env.dev === "development" ? false : true,
+            secure: process.env.dev === "development" ? false : true,
         })
 
         res.status(201).json({
@@ -296,7 +306,7 @@ const logOutUser = async (req, res) => {
 //user reset password controller
 const sendResetOtp = async (req, res) => {
     try {
-      //  console.log("hello")
+        //  console.log("hello")
         const { email } = req.body;
         if (!email) {
             throw new Error("All fildes require");
@@ -305,16 +315,16 @@ const sendResetOtp = async (req, res) => {
             const user = await User.findOne({ email: email });
             if (!user)
                 throw new Error("User Not Found!!");
-                
-             //checking resend otp time
-             const otplimit=await OTPLIMIT.findOne({otpDestination:email})   
-             if(otplimit&& otplimit.timelimit>Date.now()){
-                   throw new Error("Resend OTP disable for 2 minutes.")
-             } 
+
+            //checking resend otp time
+            const otplimit = await OTPLIMIT.findOne({ otpDestination: email })
+            if (otplimit && otplimit.timelimit > Date.now()) {
+                throw new Error("Resend OTP disable for 2 minutes.")
+            }
             //generate otp
 
             const otp = await OtpServices.generateOtp();
-      
+
             //hash otp
             //expire in 2 minutes 
             const ttl = 1000 * 60 * 2;
@@ -328,21 +338,21 @@ const sendResetOtp = async (req, res) => {
                 subject: "Reset phone OTP",
                 message: `Your Reset Phone OTP is : ${otp},valid for 2 minutes.`
             }
-           
+
             await sendEmail(options);
-            
+
 
             //set new otplimit time
-            if(otplimit){
-                otplimit.timelimit=expire;
+            if (otplimit) {
+                otplimit.timelimit = expire;
                 await otplimit.save();
-            }else{
-                await OTPLIMIT.create({ 
-                    otpDestination:email,
-                    timelimit:expire
-                 })
+            } else {
+                await OTPLIMIT.create({
+                    otpDestination: email,
+                    timelimit: expire
+                })
             }
-           // console.log(otp)
+            // console.log(otp)
             res.status(201).json({
                 "success": true,
                 "message": "OTP send successfully",
@@ -448,10 +458,10 @@ const resetPhone = async (req, res) => {
 
 
         res.cookie('accessToken', accessToken, {
-            maxAge:1000*60*60*24*30,
+            maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
             sameSite: process.env.dev === "development" ? true : "none",
-                secure: process.env.dev === "development" ? false : true,
+            secure: process.env.dev === "development" ? false : true,
         })
 
         res.status(201).json({
@@ -469,6 +479,6 @@ const resetPhone = async (req, res) => {
 }
 
 module.exports = {
-    register, verify_otp, logOutUser, loadUser,login,
+    register, verify_otp, logOutUser, loadUser, login,
     activate, sendResetOtp, verifyemail_otp, resetPhone
 }

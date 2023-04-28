@@ -1,14 +1,9 @@
 const crypto = require('crypto');
 const HashService =require('../services/hash-service')
-
+const fast2sms = require('fast-two-sms')
 const dotenv =require("dotenv");
 dotenv.config();
 
-const smsSid=process.env.SMS_SID;
-const smsAuthToken=process.env.SMS_AUTH_TOKEN;
-const twilio =require('twilio')(smsSid,smsAuthToken,{
-    lazyLoading:true
-});
 
 
 
@@ -22,11 +17,10 @@ class OtpServiecs{
 
 
    async sendBySms(phone,otp){
-        return await twilio.messages.create({
-            to:phone,
-            from:process.env.SMS_FROM_NUMBER,
-            body:`Your codershouse OTP is ${otp} and expire in 2 minutes`
-        });
+    
+
+    var options = {authorization :process.env.API_KEY,message : `Your Ginger OTP is :${otp} valid for 2 minutes` ,numbers : [phone]} 
+      return await fast2sms.sendMessage(options)
     }
 
 
