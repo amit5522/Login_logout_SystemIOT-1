@@ -1,5 +1,5 @@
 const app=require('./app');
-const path=require('path')
+
 
 //configure dot env
 const dotenv=require('dotenv')

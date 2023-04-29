@@ -14,7 +14,7 @@ class Auth_middleware {
  
             }
             else {
-                //accessToken=JSON.parse(accessToken);
+                
                 const {_id} = await tokenService.verifyAccessToken(accessToken);
                 const user=await User.findById(_id);
                 req.user = user;
