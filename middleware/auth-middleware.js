@@ -6,15 +6,15 @@ class Auth_middleware {
     async isAuth(req, res, next) {
         try {
          
-         const accessToken  = JSON.parse(req.headers.authorization);
-           console.log(req.headers);
+         let accessToken  = req.headers.authorization;
+          // console.log(req.headers);
             if (!accessToken || accessToken == null||accessToken.length<=6) {
                 throw new Error("Please login to access resources!!");
 
  
             }
             else {
-
+                accessToken=JSON.parse(accessToken);
                 const {_id} = await tokenService.verifyAccessToken(accessToken);
                 const user=await User.findById(_id);
                 req.user = user;
