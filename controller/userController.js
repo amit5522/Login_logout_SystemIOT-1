@@ -189,6 +189,7 @@ const verify_otp = async (req, res) => {
 
                     res.status(201).json({
                         user,
+                        accessToken,
                         isAuth: true,
                         success: true
                     })
