@@ -5,9 +5,9 @@ class Auth_middleware {
 
     async isAuth(req, res, next) {
         try {
-          // const { accessToken } = req.cookies;
-          //  console.log(accessToken.length)
-         const {accessToken } = req.headers.authorization.split(" ")[1];
+         
+         const accessToken  = JSON.parse(req.headers.authorization);
+           console.log(req.headers);
             if (!accessToken || accessToken == null||accessToken.length<=6) {
                 throw new Error("Please login to access resources!!");
 
