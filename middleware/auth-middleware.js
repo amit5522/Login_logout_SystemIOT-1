@@ -7,14 +7,14 @@ class Auth_middleware {
         try {
          
          let accessToken  = req.headers.authorization;
-          // console.log(req.headers);
+         // console.log(req.headers);
             if (!accessToken || accessToken == null||accessToken.length<=6) {
                 throw new Error("Please login to access resources!!");
 
  
             }
             else {
-                accessToken=JSON.parse(accessToken);
+                //accessToken=JSON.parse(accessToken);
                 const {_id} = await tokenService.verifyAccessToken(accessToken);
                 const user=await User.findById(_id);
                 req.user = user;
