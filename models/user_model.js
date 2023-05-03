@@ -23,13 +23,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    devices: [{
-       
-            type: String,
-            unique: true
-
-        
-    }],
     resetToken: String,
     resetTokenExpire: Date,
 },

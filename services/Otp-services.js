@@ -20,6 +20,7 @@ class OtpServiecs{
     
 
     var options = {authorization :process.env.API_KEY,message : `Your Ginger OTP is :${otp} valid for 2 minutes` ,numbers : [phone]} 
+       
       return await fast2sms.sendMessage(options)
     }
 

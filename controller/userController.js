@@ -100,7 +100,7 @@ const register = async (req, res) => {
             }
             //generate otp 
             const otp = await OtpServices.generateOtp();
-
+          
             //hash otp
             //expire in 2 minutes 
             const ttl = 1000 * 60 * 2;
@@ -111,12 +111,14 @@ const register = async (req, res) => {
             //send otp by sms
             let phoneNo=phone.substring(3,14);
             //send otp by sms
+            //console.log(otp)
           const smsResponse=  await OtpServices.sendBySms(phoneNo, otp);
+         // console.log(smsResponse)
           if(!smsResponse.return)
               throw new Error(smsResponse.message);
        
          //console.log(smsResponse.message[0]);
-
+         
             //set new otplimit time
             if (otplimit) {
                 otplimit.timelimit = expire;
@@ -138,7 +140,7 @@ const register = async (req, res) => {
         }
 
     } catch (error) {
-        //console.log(error.message)
+       
         res.status(401).json({
             success: false,
             message: error.message
