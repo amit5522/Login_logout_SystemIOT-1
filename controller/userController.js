@@ -252,7 +252,6 @@ const activate = async (req, res) => {
 const loadUser = async (req, res) => {
 
     try {
-
         const { _id } = req.user;
         const user = await User.findById(_id);
         res.status(201).json({
