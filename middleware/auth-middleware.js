@@ -15,14 +15,21 @@ class Auth_middleware {
             }
             else {
                 
+                
                 const {_id} = await tokenService.verifyAccessToken(accessToken);
                 const user=await User.findById(_id);
-                req.user = user;
+             //   console.log(_id);
+                if(!user){
+                    
+                    throw new Error("Please login to access resources!!");
+                }
 
+                req.user = user;
+                
                 next();
             }
         } catch (error) {
-            // console.log(error)
+             
             res.status(401).json({
                 success: false,
                 message: error.message
@@ -33,13 +40,12 @@ class Auth_middleware {
 
 async isActivated(req, res, next) {
     try {
-           // console.log(req.user)
            if(!req.user.activated)
               throw new Error("User not activated")
             next();
         }
      catch (error) {
-        // console.log(error)
+        console.log(error)
         res.status(401).json({
             success: false,
             message: error.message
